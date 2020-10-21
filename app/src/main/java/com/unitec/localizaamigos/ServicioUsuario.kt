@@ -5,7 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface ServicioUsuario {
-    //VAMOS A SEGUIR LA RUTA DE SERVICIOS ESTILO REST
+    //VAMOS A SEGUIR LA RUTA DE SERVICIOS ESTILO REST  ffgfgfgfg
 
     //Primero , siguiendo el estilo REST  usamos el metodo POST
     //EL METODO POST "SIEMPRE" SE USA PARA "GUARDAR"
