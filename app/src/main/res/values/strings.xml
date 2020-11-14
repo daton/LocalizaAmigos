@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Localiza Amigos</string>
-<string name="miToken">pk.eyJ1IjoiZGF0b24yIiwiYSI6ImNrZGdtN2V4czFxb3oycXA5eHBrcWZrd3cifQ.4XHbte4bh6khF8M_E94qQA</string>
+    <string name="miToken">pk.eyJ1IjoiZGF0b24yIiwiYSI6ImNrZGdtN2V4czFxb3oycXA5eHBrcWZrd3cifQ.4XHbte4bh6khF8M_E94qQA</string>
 </resources>
