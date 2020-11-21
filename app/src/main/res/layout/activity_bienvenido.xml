@@ -26,12 +26,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="33dp"
         android:layout_marginEnd="33dp"
-        android:layout_marginBottom="33dp"
+        android:layout_marginBottom="32dp"
         android:background="@color/mapbox_blue"
         android:text="Guardar"
         android:textColor="@color/cardview_light_background"
         app:layout_constraintBottom_toTopOf="@+id/localizar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout

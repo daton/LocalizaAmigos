@@ -186,6 +186,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
                 Globales.lat=result.lastLocation!!.latitude
                 Globales.lng=result.lastLocation!!.longitude
+                //En la siguiente clase vamos a poner en eta seccion una corutina con la cual
+                //estaremos enviando cada segundo o cuando tenga conexion
+                //la ultima localizacion actualziada.
 
 
 //PassthenewlocationtotheMapsSDK'sLocationComponent

@@ -15,12 +15,25 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 class BienvenidoActivity : AppCompatActivity() {
 
 
-    //Finalmete ponemos el objeto de respuesta (Estatus)
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bienvenido)
+
+        //Clickeo del boton
+        localizar.setOnClickListener {
+            var i=Intent(applicationContext, MainActivity::class.java)
+            startActivity(i)
+        }
+
+        //Programamos el evento del boton cuyo id es guardar para dentro de él invocar
+        //la tarea asincronica
+        guardar.setOnClickListener {
+            //Ahora aqui invocamos a la tarea asincronoca por medio de su cosntructorTarea
+            TareaGuardarUsuario(applicationContext).execute()
+        }
 
 
 
