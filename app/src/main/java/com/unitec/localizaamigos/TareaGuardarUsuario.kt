@@ -9,10 +9,10 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 class TareaGuardarUsuario(var contexto: Context?): AsyncTask<Void, Void, Void>() {
 
     //Declaramos como atributos
-    var coordenada1=Coordenada(19.50,99.8)
-    var coordenada2=Coordenada(19.51,99.63)
+    var coordenada1=Coordenada(Globales.lat!!,Globales.lng!!)
+   // var coordenada2=Coordenada(19.51,99.63)
 
-    var coordenadas= arrayListOf<Coordenada>(coordenada1, coordenada2)
+    var coordenadas= arrayListOf<Coordenada>(coordenada1)
 
     var usuario=Usuario("campitos",
         "Juan Carlos",
@@ -36,7 +36,7 @@ class TareaGuardarUsuario(var contexto: Context?): AsyncTask<Void, Void, Void>()
       //Aqui vamos a prparar nuestro usuario para enviarlo hacia el background con retrofit
       //Paso 1: Crear un objeto de tipo retrofit
         var retrofit =Retrofit.Builder()
-            .baseUrl("https://jc-unitec.herokuapp.com/")
+            .baseUrl("https://jcunitec.herokuapp.com/")
             .addConverterFactory(JacksonConverterFactory.create())
             .build()
 

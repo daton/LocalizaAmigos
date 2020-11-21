@@ -1,36 +1,40 @@
 package com.unitec.localizaamigos
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.mapbox.android.core.location.*
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.annotations.NotNull
-import java.lang.Exception
+import retrofit2.Retrofit
+import retrofit2.converter.jackson.JacksonConverterFactory
 import java.lang.ref.WeakReference
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
     private var permissionsManager: PermissionsManager = PermissionsManager(this)
     private lateinit var mapboxMap: MapboxMap
+
+    private val DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L
+    private val DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5
+
+    private var locationEngine: LocationEngine? = null
+
+
+
+    private val callback: LocationChangeListeningActivityLocationCallback =
+        LocationChangeListeningActivityLocationCallback(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +69,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
                 .accuracyColor(ContextCompat.getColor(this, R.color.colorAccent))
                 .build()
 
-            val locationComponentActivationOptions = LocationComponentActivationOptions.builder(this, loadedMapStyle)
+            val locationComponentActivationOptions = LocationComponentActivationOptions.builder(
+                this,
+                loadedMapStyle
+            )
                 .locationComponentOptions(customLocationComponentOptions)
                 .build()
 
@@ -83,6 +90,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
                 // ajustamos la brujula como visible
                 renderMode = RenderMode.COMPASS
+
+                //El nuevo
+                initLocationEngine();
             }
         } else {
             permissionsManager = PermissionsManager(this)
@@ -90,7 +100,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    @SuppressLint("MissingPermission")
+    private fun initLocationEngine() {
+        locationEngine = LocationEngineProvider.getBestLocationEngine(this)
+        val request = LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build()
+        locationEngine?.requestLocationUpdates(request, callback, mainLooper)
+        locationEngine?.getLastLocation(callback)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
@@ -141,4 +165,57 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         super.onLowMemory()
         mapView.onLowMemory()
     }
+
+
+    inner  class LocationChangeListeningActivityLocationCallback internal constructor(activity: MainActivity?):
+        LocationEngineCallback<LocationEngineResult> {
+        private val activityWeakReference: WeakReference<MainActivity>
+
+
+        override fun onSuccess(result: LocationEngineResult){
+            val activity:MainActivity=activityWeakReference.get()!!
+            if(activity!=null){
+                val location=result.lastLocation?:return
+
+
+                Toast.makeText(
+                    activity,
+                    "${result.lastLocation!!.latitude.toString()},${result.lastLocation!!.longitude.toString()},${result.lastLocation!!.altitude.toString()}",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                Globales.lat=result.lastLocation!!.latitude
+                Globales.lng=result.lastLocation!!.longitude
+
+
+//PassthenewlocationtotheMapsSDK'sLocationComponent
+                if(activity.mapboxMap!=null&&result.lastLocation!=null){
+                    activity.mapboxMap.getLocationComponent()
+                        .forceLocationUpdate(result.lastLocation)
+                }
+            }
+        }
+
+        /**
+         *TheLocationEngineCallbackinterface'smethodwhichfireswhenthedevice'slocationcan'tbecaptured
+         *
+         *@paramexceptiontheexceptionmessage
+         */
+        override fun onFailure(exception: Exception){
+           var activity :MainActivity=activityWeakReference.get()!!
+            if(activity!=null){
+                Toast.makeText(
+                    activity, exception.localizedMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        init{
+            activityWeakReference=WeakReference(activity)
+        }
+    }
+
+
 }
+
