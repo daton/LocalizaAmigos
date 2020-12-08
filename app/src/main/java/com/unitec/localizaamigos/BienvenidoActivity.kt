@@ -3,6 +3,7 @@ package com.unitec.localizaamigos
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -22,13 +23,15 @@ class BienvenidoActivity : AppCompatActivity() {
 
     var estatus=Estatus()
     var usuarios=ArrayList<Usuario>()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bienvenido)
 
         //INicializamos por primera vez la localizacion
-        Globales.lat=19.66
-        Globales.lng=66.66
+        Globales.lat = 19.66
+        Globales.lng = 66.66
 
 
         //Clickeo del boton
@@ -51,7 +54,6 @@ class BienvenidoActivity : AppCompatActivity() {
                     }
 
 
-
                 }
             }//Termina launch
 
@@ -59,8 +61,25 @@ class BienvenidoActivity : AppCompatActivity() {
         }
 
         buscar.setOnClickListener {
+            //Invocamos la corutina tal como lo hicimos en el codigo de arriba.
+            lifecycleScope.launch {
+                whenStarted {
+                    var respuesta = withContext(Dispatchers.IO) {
+                        obtenerUsuarios()
 
+                    }
 
+                    //Vamos a veerificar que siga activo el id de seguridad interno
+                    var idMio = Settings.Secure.getString(
+                        applicationContext.contentResolver,
+                        Settings.Secure.ANDROID_ID
+                    )
+                    Toast.makeText(applicationContext, "Vamos a ver ${idMio}", Toast.LENGTH_LONG)
+                        .show()
+                    var i = Intent(applicationContext, BusquedasActivity::class.java)
+                    startActivity(i)
+                }
+            }
         }
     }
 
@@ -75,6 +94,8 @@ class BienvenidoActivity : AppCompatActivity() {
 
                 var usuario = Usuario(
                     "campitos",
+                 //   Settings.Secure.getString(applicationContext.contentResolver,Settings.Secure.ANDROID_ID),
+                    "Campos",
                     "Juan Carlos",
                     "Campos",
                     "rapidclimate@gmail.com",
@@ -99,6 +120,31 @@ class BienvenidoActivity : AppCompatActivity() {
             }
 return estatus
         }
+
+    suspend fun obtenerUsuarios(){
+        //Cuando pones un suspend este tendra como tipo de retorno intrinseco la corutina:
+        return suspendCoroutine {
+            //Aqui dentro va todo lo que tu ponias en el metodo donInBackground de tu tareaAsincronoca
+
+            var retrofit = Retrofit.Builder()
+                .baseUrl("https://jcunitec.herokuapp.com/")
+                .addConverterFactory(JacksonConverterFactory.create())
+                .build()
+
+            //PASO 2: GENERAR UN OBJETO PARAHABILITAR TU SERVICIO DE RETROFIT USANDO EL OBJETO
+            //DEL PUNTO ANTERIOR
+            var servicioUsuario = retrofit.create(ServicioUsuario::class.java)
+
+
+            //PASO 3: ENVIAR AL BACK -END
+            var enviarUsuarios = servicioUsuario.buscarTodos()
+            //SE ENVIA  AL BACK- END Y  EN ESTE MOMENTO SE OBTIENE LA RESPUESTA
+            usuarios = enviarUsuarios.execute().body()!!
+            Log.i("TTT","Usuarios encontrados ${usuarios}")
+
+        }
+
+    }
 
 
 

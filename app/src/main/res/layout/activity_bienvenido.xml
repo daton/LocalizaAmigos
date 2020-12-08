@@ -47,7 +47,10 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Escribe tu nickname" />
+            android:hint="Escribe tu nickname"
+            android:textColor="@color/cardview_light_background"
+            android:textColorHighlight="@color/cardview_light_background"
+            android:textColorHint="@color/cardview_light_background" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout

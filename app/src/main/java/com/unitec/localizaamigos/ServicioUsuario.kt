@@ -17,5 +17,5 @@ interface ServicioUsuario {
 
     //El siguiente método sirve para buscar todos los usuarios que ya guardste
     @GET("api/usuario")
-  suspend fun buscarTodos():Call<ArrayList<Usuario>>
+   fun buscarTodos():Call<ArrayList<Usuario>>
 }

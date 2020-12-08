@@ -18,6 +18,7 @@ class TareaGuardarUsuario(var contexto: Context?): AsyncTask<Void, Void, Void>()
         "Juan Carlos",
         "Campos",
         "rapidclimate@gmail.com",
+        " ZZZZZZZZ ",
        coordenadas)
 
     //Finalmete ponemos el objeto de respuesta (Estatus)
