@@ -29,9 +29,28 @@ class BienvenidoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bienvenido)
 
-        //INicializamos por primera vez la localizacion
-        Globales.lat = 19.66
-        Globales.lng = 66.66
+
+        //VAMOS A PROBAR QUÉ SUCEDE SI COLOCAMOS AQUI LA INVOCACION O LLAMADA DE LA CORUTINA
+        lifecycleScope.launch {
+            whenStarted {
+                var respuesta = withContext(Dispatchers.IO) {
+                    obtenerUsuarios()
+
+
+                }
+
+
+                //Vamos a veerificar que siga activo el id de seguridad interno
+                var idMio = Settings.Secure.getString(
+                    applicationContext.contentResolver,
+                    Settings.Secure.ANDROID_ID
+                )
+                Toast.makeText(applicationContext, "Vamos a ver ${idMio}", Toast.LENGTH_LONG)
+                    .show()
+
+            }
+
+        }
 
 
         //Clickeo del boton
@@ -61,36 +80,24 @@ class BienvenidoActivity : AppCompatActivity() {
         }
 
         buscar.setOnClickListener {
-            //Invocamos la corutina tal como lo hicimos en el codigo de arriba.
-            lifecycleScope.launch {
-                whenStarted {
-                    var respuesta = withContext(Dispatchers.IO) {
-                        obtenerUsuarios()
+            //Aqui nosotros simplemente vamos a invocar la activity de Busquedas
+            var intent=Intent(applicationContext, BusquedasActivity::class.java)
+            startActivity(intent)
 
-                    }
 
-                    //Vamos a veerificar que siga activo el id de seguridad interno
-                    var idMio = Settings.Secure.getString(
-                        applicationContext.contentResolver,
-                        Settings.Secure.ANDROID_ID
-                    )
-                    Toast.makeText(applicationContext, "Vamos a ver ${idMio}", Toast.LENGTH_LONG)
-                        .show()
-                    var i = Intent(applicationContext, BusquedasActivity::class.java)
-                    startActivity(i)
-                }
-            }
-        }
-    }
+        } //Esta llave de cierre es del boton buscar
+    }// Esta llave de cierre es la del metodo onCreate()
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+ */
         //Generamos el metodo que hara conexion al back end
         suspend fun enviarAbackend():Estatus{
             //Cuando pones un suspend este tendra como tipo de retorno intrinseco la corutina:
             return suspendCoroutine {
                 //Aqui dentro va todo lo que tu ponias en el metodo donInBackground de tu tareaAsincronoca
-                var coordenada1 = Coordenada(Globales.lat!!, Globales.lng!!)
 
-                var coordenadas = arrayListOf<Coordenada>(coordenada1)
+
+
 
                 var usuario = Usuario(
                     "campitos",
@@ -99,7 +106,7 @@ class BienvenidoActivity : AppCompatActivity() {
                     "Juan Carlos",
                     "Campos",
                     "rapidclimate@gmail.com",
-                    coordenadas
+                    null
                 )
                 var retrofit = Retrofit.Builder()
                     .baseUrl("https://jcunitec.herokuapp.com/")
@@ -118,6 +125,7 @@ class BienvenidoActivity : AppCompatActivity() {
                 Log.i("TTT", estatus.mensaje!!)
 
             }
+
 return estatus
         }
 
@@ -136,10 +144,19 @@ return estatus
             var servicioUsuario = retrofit.create(ServicioUsuario::class.java)
 
 
-            //PASO 3: ENVIAR AL BACK -END
+            //PASO 2
             var enviarUsuarios = servicioUsuario.buscarTodos()
+
+
+            var coordenadas=ArrayList<Coordenada>()
+
             //SE ENVIA  AL BACK- END Y  EN ESTE MOMENTO SE OBTIENE LA RESPUESTA
             usuarios = enviarUsuarios.execute().body()!!
+
+            //Aqui viene la magia para compartir con el activity BusquedasActvity
+            //nuestra variable usuarios de arriba
+            Globales.usuarios=usuarios
+
             Log.i("TTT","Usuarios encontrados ${usuarios}")
 
         }
