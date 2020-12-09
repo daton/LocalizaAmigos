@@ -24,7 +24,7 @@ class BienvenidoActivity : AppCompatActivity() {
     var estatus=Estatus()
     var usuarios=ArrayList<Usuario>()
     
-    
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,7 +99,9 @@ class BienvenidoActivity : AppCompatActivity() {
                 //Aqui dentro va todo lo que tu ponias en el metodo donInBackground de tu tareaAsincronoca
 
 
-
+                var coordenada=Coordenada(Globales.lat, Globales.lng)
+                var coordenadas=ArrayList<Coordenada>()
+                coordenadas.add(coordenada)
 
                 var usuario = Usuario(
                     "campitos",
@@ -108,7 +110,7 @@ class BienvenidoActivity : AppCompatActivity() {
                     "Juan Carlos",
                     "Campos",
                     "rapidclimate@gmail.com",
-                    null
+                    coordenadas
                 )
                 var retrofit = Retrofit.Builder()
                     .baseUrl("https://jcunitec.herokuapp.com/")
