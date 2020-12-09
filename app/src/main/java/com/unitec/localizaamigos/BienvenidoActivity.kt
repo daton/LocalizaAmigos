@@ -23,6 +23,8 @@ class BienvenidoActivity : AppCompatActivity() {
 
     var estatus=Estatus()
     var usuarios=ArrayList<Usuario>()
+    
+    
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
